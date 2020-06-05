@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  h1 Minecraft Server Admin
+  p= statusMsg
+  if showStartButton
+    form(action="/start" method="GET" id='startForm')
+    button(type="submit" form="startForm") Start Server
+  if showStopButton
+    form(action="/stop" method="GET" id='stopForm')
+    button(type="submit" form="stopForm") Stop Server
