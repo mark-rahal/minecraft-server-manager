@@ -384,6 +384,11 @@ mime@1.4.1:
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.4.1.tgz#121f9ebc49e3766f311a76e1fa1c8003c4b03aa6"
   integrity sha512-KI1+qOZu5DcW6wayYHSzR/tXKCDC5Om4s1z2QJjDULzLcmf3DvzS7oluY4HCTrc+9FiKmWUgeNLg7W3uIQvxtQ==
 
+minecraft-ping@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/minecraft-ping/-/minecraft-ping-1.0.0.tgz#e0eb3dd6b834d86861316bc4e75dadc4ba0207e8"
+  integrity sha1-4Os91rg02GhhMWvE512txLoCB+g=
+
 morgan@~1.9.1:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.9.1.tgz#0a8d16734a1d9afbc824b99df87e738e58e2da59"
