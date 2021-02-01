@@ -40,10 +40,12 @@ app.use(function(err, req, res, next) {
 });
 
 function stopServerIfEmpty() {
+  console.log('Checking player count...');
   minecraftPing.ping_fe01fa({ host: metadata.serverIP, port: 25565 }, (err, response) => {
     if (err) {
       return;
     }
+    console.log('Players online: ' + response.playersOnline);
     if (response.playersOnline === 0) {
       var ec2 = new EC2({
         apiVersion: '2016-04-01',
