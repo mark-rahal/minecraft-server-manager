@@ -40,6 +40,17 @@ app.use(function(err, req, res, next) {
 });
 
 function stopServerIfEmpty() {
+  // check if server is even running
+  ec2.describeInstanceStatus({ InstanceIds: [metadata.instanceId], IncludeAllInstances: true }).promise().then(function(data) {
+    const instanceState = data.InstanceStatuses[0].InstanceState.Name;
+    if ((instanceState === 'shutting-down') || (instanceState === 'stopping') || (instanceState === 'stopped')) {
+      // no need to check if players are online
+      return;
+    }
+  }).catch(function(err) {
+    console.log(err.message)
+  });
+
   console.log('Checking player count...');
   minecraftPing.ping_fe01fa({ host: metadata.serverIP, port: 25565 }, (err, response) => {
     if (err) {
