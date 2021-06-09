@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var EC2 = require('aws-sdk/clients/ec2');
 var metadata = require('./metadata');
-var minecraftPing = require('minecraft-ping')
+var minecraftPing = require('minecraft-ping');
 
 var indexRouter = require('./routes/index');
 
@@ -25,53 +25,54 @@ app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 function stopServerIfEmpty() {
-  // check if server is even running
-  ec2.describeInstanceStatus({ InstanceIds: [metadata.instanceId], IncludeAllInstances: true }).promise().then(function(data) {
-    const instanceState = data.InstanceStatuses[0].InstanceState.Name;
-    if ((instanceState === 'shutting-down') || (instanceState === 'stopping') || (instanceState === 'stopped')) {
-      // no need to check if players are online
-      return;
-    }
-  }).catch(function(err) {
-    console.log(err.message)
-  });
-
-  console.log('Checking player count...');
-  minecraftPing.ping_fe01fa({ host: metadata.serverIP, port: 25565 }, (err, response) => {
-    if (err) {
-      return;
-    }
-    console.log('Players online: ' + response.playersOnline);
-    if (response.playersOnline === 0) {
-      var ec2 = new EC2({
+    var ec2 = new EC2({
         apiVersion: '2016-04-01',
         region: 'us-west-1'
-      });
-
-      ec2.stopInstances({ InstanceIds: [metadata.instanceId] }).promise().then(function(data) {
-        console.log("No players online, stopping server.");
-      }).catch(function(err) {
+    });
+    // check if server is even running
+    ec2.describeInstanceStatus({ InstanceIds: [metadata.instanceId], IncludeAllInstances: true }).promise().then(function(data) {
+        const instanceState = data.InstanceStatuses[0].InstanceState.Name;
+        if ((instanceState === 'shutting-down') || (instanceState === 'stopping') || (instanceState === 'stopped')) {
+            // no need to check if players are online
+            return;
+        } else {
+            console.log('Checking player count...');
+            minecraftPing.ping_fe01fa({ host: metadata.serverIP, port: 25565 }, (err, response) => {
+                if (err) {
+                    return;
+                }
+                console.log('Players online: ' + response.playersOnline);
+                if (response.playersOnline === 0) {
+                    ec2.stopInstances({ InstanceIds: [metadata.instanceId] }).promise().then(function(data) {
+                        console.log("No players online, stopping server.");
+                    }).catch(function(err) {
+                        console.log(err.message);
+                        stopServerIfEmpty();
+                    });
+                }
+            });
+        }
+    }).catch(function(err) {
         console.log(err.message);
-      });
-    }
-  })
+        stopServerIfEmpty();
+    });
 }
 
-setInterval(stopServerIfEmpty, metadata.shutdownCheckInterval);
+//setInterval(stopServerIfEmpty, metadata.shutdownCheckInterval);
 
 module.exports = app;
