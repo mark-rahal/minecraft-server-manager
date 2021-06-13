@@ -9,3 +9,5 @@ block content
   if showStopButton
     form(action="/stop" method="GET" id='stopForm')
     button(type="submit" form="stopForm") Stop Server
+    script.
+        console.log(serverPing)
