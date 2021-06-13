@@ -19,7 +19,8 @@ router.get('/', function(req, res, next) {
             // get players online
             // allow user to stop server
             mcPing.ping_fe01fa({ host: metadata.serverAddress, port: 25565 }, function(err, response) {
-                res.render('index', { statusMsg: 'Server is running.', showStopButton: true, serverPing: response });
+                console.log(err, response);
+                res.render('index', { statusMsg: 'Server is running.', showStopButton: true, serverPing: JSON.stringify(response) });
             });
         } else if (instanceState === 'pending') {
             res.render('index', { statusMsg: 'Server is starting.' });
